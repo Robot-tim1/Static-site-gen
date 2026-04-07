@@ -34,6 +34,13 @@ class TestHTMLNode(unittest.TestCase):
             })
         node2 = ' href="https://www.google.com"'
         self.assertEqual(node.props_to_html(), node2)
+
+    def test_propseq4(self):
+        node = HTMLnode(None, None, None,{
+        "href": 132,
+            })
+        node2 = ' href="132"'
+        self.assertEqual(node.props_to_html(), node2)
     
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "Hello, world!")
@@ -59,6 +66,10 @@ class TestHTMLNode(unittest.TestCase):
         node = LeafNode("b", "Hello, world!")
         self.assertNotEqual(node.to_html(), "<p>Hello, world!</p>")
 
+    def test_leaf_to_html_pnoteq2(self):
+        node = LeafNode("b", {"5": 'p'})
+        self.assertNotEqual(node.to_html(), "<b>5</p>")
+
     def test_leaf_to_html_a(self):
         node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
         self.assertEqual(node.to_html(), '<a href="https://www.google.com">Click me!</a>')
@@ -71,6 +82,17 @@ class TestHTMLNode(unittest.TestCase):
         child_node = LeafNode("span", "child")
         parent_node = ParentNode("div", [child_node])
         self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_children2(self):
+        child_node = LeafNode("span", {"child": 'game'})
+        parent_node = ParentNode("div", [child_node])
+        self.assertNotEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_children3(self):
+        with self.assertRaises(ValueError):
+            child_node = LeafNode("span", None)
+            parent_node = ParentNode("div", [child_node])
+            self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
 
     def test_to_html_with_grandchildren(self):
         grandchild_node = LeafNode("b", "grandchild")
@@ -108,7 +130,18 @@ class TestHTMLNode(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, None)
         self.assertEqual(html_node.value, "This is a text node")
-    
+
+    def test_text2(self):
+        node = TextNode("", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "")
+
+    def test_empty(self):
+        with self.assertRaises(AttributeError):
+            node = TextNode("", None)
+            html_node = text_node_to_html_node(node)
+        
     def test_plain(self):
         node = TextNode("This is a plain node", TextType.PLAIN)
         html_node = text_node_to_html_node(node)
@@ -150,6 +183,11 @@ class TestHTMLNode(unittest.TestCase):
     def test_AttributeError(self):
         with self.assertRaises(AttributeError):
             node = TextNode("This is a rat node", TextType.RAT)  
+
+    def test_NotImplementedError(self):
+        with self.assertRaises(NotImplementedError):
+            node = HTMLnode('p', None, 5)
+            node.to_html()
 
 if __name__ == "__main__":
     unittest.main()
