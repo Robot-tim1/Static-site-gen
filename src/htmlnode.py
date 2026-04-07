@@ -66,7 +66,9 @@ class ParentNode(HTMLnode):
         if self.tag != 'html':
             return f'<{self.tag}>{"".join(lst)}</{self.tag}>'
         return f'<{self.tag}{self.props_to_html()}>{"".join(lst)}</{self.tag}>'
-        
+
+     def __repr__(self):
+        return f"{self.tag}, {self.value}, {self.props}"   
 
 def text_node_to_html_node(text_node: TextNode):
     if not text_node:
