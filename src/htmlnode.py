@@ -35,7 +35,7 @@ class LeafNode(HTMLnode):
             return f"{self.value}"
         
         match self.tag:
-            case "p"|"b"|"i"|"code"|"blockquote"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|"div"|"span"|"head"|"body"|"title":
+            case "p"|"b"|"i"|"code"|"blockquote"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|"div"|"span"|"head"|"body"|"title"|"li"|"ol"|"ul":
                 return f"<{self.tag}>{self.value}</{self.tag}>"
             case "a":
                 return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
