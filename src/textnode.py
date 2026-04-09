@@ -30,7 +30,9 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
             clean_nodes.append(TextNode(node.text, TextType.TEXT, node.url))
         else:
             clean_nodes.append(node)
-
+    
+    new_nodes = []
+    
     for node in clean_nodes:
         stack = []
         for letter in range(len(node.text)):
@@ -41,14 +43,13 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
                 stack.append(delimiter)
         if len(stack) < 2:
             raise Exception("Delimiter not found")
-        split_text = []
-        for letter in node.text:
-            split_text.append(letter)
-        result = split_node_helper(split_text, delimiter)
-
-
-def split_node_helper(split_text: list, delimiter):
+        text = node.text
+        print(text)
+        
+            
+def split_node_helper(text, delimiter):
     pass
 
-node = TextNode("`This` is `text with a `code block` word", TextType.TEXT)
+
+node = TextNode("This is text `with a `italic block` word", TextType.TEXT)
 split_nodes_delimiter([node], "`", TextType.CODE)
