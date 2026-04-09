@@ -22,3 +22,33 @@ class TextNode():
     
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
+    
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
+    clean_nodes = [] 
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            clean_nodes.append(TextNode(node.text, TextType.TEXT, node.url))
+        else:
+            clean_nodes.append(node)
+
+    for node in clean_nodes:
+        stack = []
+        for letter in range(len(node.text)):
+            if len(delimiter) > 1:
+                if (node.text[letter:letter + len(delimiter)]) == delimiter:
+                    stack.append(delimiter)
+            elif node.text[letter] == delimiter:
+                stack.append(delimiter)
+        if len(stack) < 2:
+            raise Exception("Delimiter not found")
+        split_text = []
+        for letter in node.text:
+            split_text.append(letter)
+        result = split_node_helper(split_text, delimiter)
+
+
+def split_node_helper(split_text: list, delimiter):
+    pass
+
+node = TextNode("`This` is `text with a `code block` word", TextType.TEXT)
+split_nodes_delimiter([node], "`", TextType.CODE)
