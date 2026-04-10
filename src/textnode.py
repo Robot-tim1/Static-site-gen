@@ -25,22 +25,32 @@ class TextNode():
     
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
     clean_nodes = [] 
-    new_nodes = []
+    new_nodes = [[]]
     delimiter_size = len(delimiter)
     for node in old_nodes:
         if node.text_type == TextType.TEXT:
             clean_nodes.append(node)
         else:
-            new_nodes.append(node)
+            new_nodes[0].append(node)
     
-    front_point = 0
-    back_point = front_point + delimiter_size
-    start_point = 0
-    last_start_point = start_point
+    if new_nodes[0] != []:
+        counter = 0
+    else:    
+        counter = -1
 
-    for node in clean_nodes:
+    for clean_node in clean_nodes:
+        
+        counter += 1
         stack = [1,1]
-        text = node.text
+        front_point = 0
+        back_point = front_point + delimiter_size
+        start_point = 0
+        last_start_point = start_point
+        text = clean_node.text
+        
+        if len(new_nodes) <= counter:
+            new_nodes.append([])
+        
         while front_point != len(text):
             
             if len(stack) % 2 != 0 and text[front_point+1:back_point+1] == delimiter:
@@ -50,31 +60,30 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
 
             if back_point == len(text):
                 if text[front_point:back_point] == delimiter:
-                    new_nodes.append(TextNode(text[start_point:back_point-1], text_type))
+                    new_nodes[counter].append(TextNode(text[start_point:back_point-1], text_type))
                     stack.append(1)
                 else:
-                    new_nodes.append(TextNode(text[start_point:back_point+1], TextType.TEXT))
+                    new_nodes[counter].append(TextNode(text[start_point:back_point+1], TextType.TEXT))
                 break
             
             if text[front_point:back_point] == delimiter and len(stack) % 2 == 0 and text[back_point] != " ":
                 
                 if text[start_point:front_point] != "" and text[start_point:front_point] != delimiter:
-                    new_nodes.append(TextNode(text[start_point:front_point], TextType.TEXT))
+                    new_nodes[counter].append(TextNode(text[start_point:front_point], TextType.TEXT))
                     stack.append(1)
                     last_start_point = start_point
                     start_point = back_point
             
             elif text[front_point:back_point] == delimiter and len(stack) % 2 != 0:
                 
-                
                 if text[front_point-1] == " " and text[back_point] != " ":
-                    new_nodes.pop()
+                    new_nodes[counter].pop()
                     stack.append(1)
-                    new_nodes.append(TextNode(text[last_start_point:front_point], TextType.TEXT))
+                    new_nodes[counter].append(TextNode(text[last_start_point:front_point], TextType.TEXT))
                     start_point = front_point
 
-                if text[start_point:back_point].strip(delimiter) != "":
-                    new_nodes.append(TextNode(text[start_point:back_point].strip(delimiter), text_type))
+                elif text[start_point:back_point].strip(delimiter) != "":
+                    new_nodes[counter].append(TextNode(text[start_point:back_point].strip(delimiter), text_type))
                     stack.append(1)
                     last_start_point = start_point
                     start_point = front_point + delimiter_size
@@ -85,19 +94,18 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
 
             front_point += 1
             back_point = front_point + delimiter_size
-        
+
         if len(stack) % 2 != 0:
+            print("son")
             raise Exception("invalid Markdown syntax, missing a closing delimiter")
         
-    counter = 0
-    for node in new_nodes:     
-        if node.text_type == TextType.TEXT:
-            counter += 1
-    if counter == len(new_nodes):
-        raise Exception("invalid Markdown syntax, no delimiter pairs")
-
+        counter2 = 0
+        for node in new_nodes[counter]:
+            if node.text_type == TextType.TEXT:
+                counter2 += 1
+        if counter2 == len(new_nodes[counter]):
+            raise Exception("invalid, no things to delimit here")
+    
+    if len(new_nodes) == 1:
+        return new_nodes[0]
     return new_nodes
-
-node = TextNode("This is _text_ with a italic _block word_", TextType.TEXT)
-new_nodes = split_nodes_delimiter([node], "_", TextType.BOLD)
-print(new_nodes)

@@ -227,14 +227,14 @@ class TestHTMLNode(unittest.TestCase):
         node = TextNode("This is text with a _italic block_ word", TextType.TEXT)
         node2 = TextNode("This is _text_ with a italic _block word_", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node, node2], "_", TextType.ITALIC)
-        self.assertEqual(new_nodes, [
+        self.assertEqual(new_nodes, [[
     TextNode("This is text with a ", TextType.TEXT),
     TextNode("italic block", TextType.ITALIC),
     TextNode(" word", TextType.TEXT),] , [
     TextNode("This is ", TextType.TEXT),
     TextNode("text", TextType.ITALIC),
     TextNode(" with a italic ", TextType.TEXT),
-    TextNode("block word", TextType.ITALIC),])
+    TextNode("block word", TextType.ITALIC),]])
         
 if __name__ == "__main__":
     unittest.main()
