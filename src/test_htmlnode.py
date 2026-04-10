@@ -189,5 +189,52 @@ class TestHTMLNode(unittest.TestCase):
             node = HTMLnode('p', None, 5)
             node.to_html()
 
+    def test_split_node(self):
+        node = TextNode("This is text with a _italic block_ word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        self.assertEqual(new_nodes, [
+    TextNode("This is text with a ", TextType.TEXT),
+    TextNode("italic block", TextType.ITALIC),
+    TextNode(" word", TextType.TEXT),])
+        
+    def test_split_node_bold(self):
+        node = TextNode("This is text with a **bold block** word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(new_nodes, [
+    TextNode("This is text with a ", TextType.TEXT),
+    TextNode("bold block", TextType.BOLD),
+    TextNode(" word", TextType.TEXT),])
+        
+    def test_split_node_bold2(self):
+        node = TextNode("This is text with a ***bold block**** word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(new_nodes, [
+    TextNode("This is text with a ", TextType.TEXT),
+    TextNode("bold block", TextType.BOLD),
+    TextNode(" word", TextType.TEXT),])
+
+    def test_split_node_failure(self):
+        with self.assertRaises(Exception):
+            node = TextNode("This is text **with a **bold block** word", TextType.TEXT)
+            new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+
+    def test_split_node_failure2(self):
+        with self.assertRaises(Exception):
+            node = TextNode("This is text **with a **bold block** word**", TextType.TEXT)
+            new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+
+    def test_split_node_multiple(self):
+        node = TextNode("This is text with a _italic block_ word", TextType.TEXT)
+        node2 = TextNode("This is _text_ with a italic _block word_", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node, node2], "_", TextType.ITALIC)
+        self.assertEqual(new_nodes, [
+    TextNode("This is text with a ", TextType.TEXT),
+    TextNode("italic block", TextType.ITALIC),
+    TextNode(" word", TextType.TEXT),] , [
+    TextNode("This is ", TextType.TEXT),
+    TextNode("text", TextType.ITALIC),
+    TextNode(" with a italic ", TextType.TEXT),
+    TextNode("block word", TextType.ITALIC),])
+        
 if __name__ == "__main__":
     unittest.main()

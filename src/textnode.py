@@ -36,39 +36,68 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
     front_point = 0
     back_point = front_point + delimiter_size
     start_point = 0
+    last_start_point = start_point
 
     for node in clean_nodes:
         stack = [1,1]
         text = node.text
         while front_point != len(text):
             
+            if len(stack) % 2 != 0 and text[front_point+1:back_point+1] == delimiter:
+                front_point += 1
+                back_point = front_point + delimiter_size
+                continue
+
             if back_point == len(text):
-                new_nodes.append(TextNode(text[start_point:back_point+1], TextType.TEXT))
+                if text[front_point:back_point] == delimiter:
+                    new_nodes.append(TextNode(text[start_point:back_point-1], text_type))
+                    stack.append(1)
+                else:
+                    new_nodes.append(TextNode(text[start_point:back_point+1], TextType.TEXT))
                 break
             
             if text[front_point:back_point] == delimiter and len(stack) % 2 == 0 and text[back_point] != " ":
+                
                 if text[start_point:front_point] != "" and text[start_point:front_point] != delimiter:
                     new_nodes.append(TextNode(text[start_point:front_point], TextType.TEXT))
                     stack.append(1)
+                    last_start_point = start_point
                     start_point = back_point
             
-            elif text[front_point:back_point] == delimiter and len(stack) % 2 != 0 and text[front_point-1] != " ":
+            elif text[front_point:back_point] == delimiter and len(stack) % 2 != 0:
+                
+                
+                if text[front_point-1] == " " and text[back_point] != " ":
+                    new_nodes.pop()
+                    stack.append(1)
+                    new_nodes.append(TextNode(text[last_start_point:front_point], TextType.TEXT))
+                    start_point = front_point
+
                 if text[start_point:back_point].strip(delimiter) != "":
                     new_nodes.append(TextNode(text[start_point:back_point].strip(delimiter), text_type))
-                    stack.pop()
-                    start_point = front_point + delimiter_size + 1
-            
+                    stack.append(1)
+                    last_start_point = start_point
+                    start_point = front_point + delimiter_size
+                    temp = start_point
+                    while text[temp:temp + delimiter_size] == delimiter or text[temp] == delimiter[0]:
+                        temp += 1
+                    start_point = temp
+
             front_point += 1
             back_point = front_point + delimiter_size
+        
+        if len(stack) % 2 != 0:
+            raise Exception("invalid Markdown syntax, missing a closing delimiter")
         
     counter = 0
     for node in new_nodes:     
         if node.text_type == TextType.TEXT:
             counter += 1
     if counter == len(new_nodes):
-        raise Exception("invalid Markdown syntax, no closing delimiter")
+        raise Exception("invalid Markdown syntax, no delimiter pairs")
 
-    print(new_nodes)
+    return new_nodes
 
-node = TextNode("This is text with a ***italic block**** word", TextType.TEXT)
-split_nodes_delimiter([node], "*", TextType.ITALIC)
+node = TextNode("This is _text_ with a italic _block word_", TextType.TEXT)
+new_nodes = split_nodes_delimiter([node], "_", TextType.BOLD)
+print(new_nodes)
