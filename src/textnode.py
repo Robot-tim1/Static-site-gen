@@ -96,7 +96,6 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
             back_point = front_point + delimiter_size
 
         if len(stack) % 2 != 0:
-            print("son")
             raise Exception("invalid Markdown syntax, missing a closing delimiter")
         
         counter2 = 0
