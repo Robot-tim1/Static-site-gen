@@ -60,7 +60,7 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
 
             if back_point == len(text):
                 if text[front_point:back_point] == delimiter:
-                    new_nodes[counter].append(TextNode(text[start_point:back_point-1], text_type))
+                    new_nodes[counter].append(TextNode(text[start_point:back_point-1].strip(delimiter), text_type))
                     stack.append(1)
                 else:
                     new_nodes[counter].append(TextNode(text[start_point:back_point+1], TextType.TEXT))
@@ -68,11 +68,14 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
             
             if text[front_point:back_point] == delimiter and len(stack) % 2 == 0 and text[back_point] != " ":
                 
-                if text[start_point:front_point] != "" and text[start_point:front_point] != delimiter:
-                    new_nodes[counter].append(TextNode(text[start_point:front_point], TextType.TEXT))
-                    stack.append(1)
-                    last_start_point = start_point
-                    start_point = back_point
+                if delimiter in text[start_point:front_point]:
+                    temp = start_point
+                    for i in text[temp:front_point]:
+                        start_point += 1
+                new_nodes[counter].append(TextNode(text[start_point:front_point], TextType.TEXT))
+                stack.append(1)
+                last_start_point = start_point
+                start_point = back_point
             
             elif text[front_point:back_point] == delimiter and len(stack) % 2 != 0:
                 
@@ -98,6 +101,9 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
         if len(stack) % 2 != 0:
             raise Exception("invalid Markdown syntax, missing a closing delimiter")
         
+        if new_nodes[counter][0].text == "":
+            del new_nodes[counter][0]
+
         counter2 = 0
         for node in new_nodes[counter]:
             if node.text_type == TextType.TEXT:

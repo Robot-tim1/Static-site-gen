@@ -213,6 +213,13 @@ class TestHTMLNode(unittest.TestCase):
     TextNode("bold block", TextType.BOLD),
     TextNode(" word", TextType.TEXT),])
 
+    def test_split_node_italic2(self):
+        node = TextNode("_This is text with_ a italic block word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        self.assertEqual(new_nodes, [
+    TextNode("This is text with", TextType.ITALIC),
+    TextNode(" a italic block word", TextType.TEXT),])
+    
     def test_split_node_failure(self):
         with self.assertRaises(Exception):
             node = TextNode("This is text **with a **bold block** word", TextType.TEXT)
