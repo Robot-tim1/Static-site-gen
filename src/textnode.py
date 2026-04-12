@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 
 class TextType(Enum):
     TEXT = "text"
@@ -114,3 +115,12 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
     if len(new_nodes) == 1:
         return new_nodes[0]
     return new_nodes
+
+def extract_markdown_images(text):
+    matches = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches
+
+def extract_markdown_links(text):
+    matches = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches
+
