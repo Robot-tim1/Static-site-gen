@@ -160,3 +160,40 @@ def split_nodes_link(old_nodes):
     if len(new_nodes) == 1:
         return new_nodes[0]
     return new_nodes
+
+def split_nodes_image(old_nodes):
+    
+    new_nodes = [[]]
+    node_counter = -1
+
+    for node in old_nodes:
+        
+        node_counter += 1
+        text = node.text
+        
+        if len(new_nodes) <= node_counter:
+            new_nodes.append([])
+
+        if extract_markdown_images(text) == []:
+            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            continue
+        
+        while extract_markdown_images(text) != []:
+            
+            matches = extract_markdown_images(text)
+            image_text = matches[0][0]
+            image = matches[0][1]
+            delimiter = f"![{image_text}]({image})"
+            sections = text.split(delimiter, 1)
+            
+            if sections[0] != "":
+                new_nodes[node_counter].append(TextNode(sections[0], TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(image_text, TextType.IMAGE, image))
+            
+            text = sections[1]
+        if text != "":
+            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+    
+    if len(new_nodes) == 1:
+        return new_nodes[0]
+    return new_nodes
