@@ -133,3 +133,30 @@ def split_nodes_link(old_nodes):
         
         node_counter += 1
         text = node.text
+        
+        if len(new_nodes) <= node_counter:
+            new_nodes.append([])
+
+        if extract_markdown_links(text) == []:
+            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            continue
+        
+        while extract_markdown_links(text) != []:
+            
+            matches = extract_markdown_links(text)
+            link_text = matches[0][0]
+            link = matches[0][1]
+            delimiter = f"[{link_text}]({link})"
+            sections = text.split(delimiter, 1)
+            
+            if sections[0] != "":
+                new_nodes[node_counter].append(TextNode(sections[0], TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(link_text, TextType.LINK, link))
+            
+            text = sections[1]
+        if text != "":
+            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+    
+    if len(new_nodes) == 1:
+        return new_nodes[0]
+    return new_nodes
