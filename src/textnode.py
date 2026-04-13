@@ -138,7 +138,7 @@ def split_nodes_link(old_nodes):
             new_nodes.append([])
 
         if extract_markdown_links(text) == []:
-            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(text, node.text_type))
             continue
         
         while extract_markdown_links(text) != []:
@@ -150,12 +150,12 @@ def split_nodes_link(old_nodes):
             sections = text.split(delimiter, 1)
             
             if sections[0] != "":
-                new_nodes[node_counter].append(TextNode(sections[0], TextType.TEXT))
+                new_nodes[node_counter].append(TextNode(sections[0], node.text_type))
             new_nodes[node_counter].append(TextNode(link_text, TextType.LINK, link))
             
             text = sections[1]
         if text != "":
-            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(text, node.text_type))
     
     if len(new_nodes) == 1:
         return new_nodes[0]
@@ -175,7 +175,7 @@ def split_nodes_image(old_nodes):
             new_nodes.append([])
 
         if extract_markdown_images(text) == []:
-            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(text, node.text_type))
             continue
         
         while extract_markdown_images(text) != []:
@@ -187,12 +187,12 @@ def split_nodes_image(old_nodes):
             sections = text.split(delimiter, 1)
             
             if sections[0] != "":
-                new_nodes[node_counter].append(TextNode(sections[0], TextType.TEXT))
+                new_nodes[node_counter].append(TextNode(sections[0], node.text_type))
             new_nodes[node_counter].append(TextNode(image_text, TextType.IMAGE, image))
             
             text = sections[1]
         if text != "":
-            new_nodes[node_counter].append(TextNode(text, TextType.TEXT))
+            new_nodes[node_counter].append(TextNode(text, node.text_type))
     
     if len(new_nodes) == 1:
         return new_nodes[0]
