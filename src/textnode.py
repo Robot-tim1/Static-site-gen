@@ -124,3 +124,27 @@ def extract_markdown_links(text):
     matches = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return matches
 
+def split_nodes_link(old_nodes):
+    
+    new_nodes = [[]]
+    counter = -1
+
+    for node in old_nodes:
+        
+        node_counter += 1
+        link_counter = 0
+        sqaure_stack = []
+        bracket_stack = []
+        current_point = 0
+        start_point = 0
+        end_point = 0
+        last_start_point = start_point
+        text = node.text
+        sqaure_brackets_found = False
+        brackets_found = False
+        
+        while current_point != len(text):
+            
+            if text[current_point] == "[" and not sqaure_brackets_found:
+                end_point = current_point
+
