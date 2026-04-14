@@ -203,12 +203,18 @@ def split_nodes_image(old_nodes):
 
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.TEXT)]
-
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
-
-    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-
-    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    try:
+        nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    except Exception:
+        pass
+    try:
+        nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    except Exception:
+        pass
+    try:
+        nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    except Exception:
+        pass
    
     nodes = split_nodes_image(nodes)
 
