@@ -116,13 +116,12 @@ class TestTextNode(unittest.TestCase):
         )
         new_nodes = split_nodes_link([node, node2])
         self.assertListEqual(
-            [[
+            [
                 TextNode("This is text with an ", TextType.TEXT),
                 TextNode("this is a link", TextType.LINK, "linktolink.com"),
-            ],[
                 TextNode("This is text with a ", TextType.TEXT),
                 TextNode("this is a second link", TextType.LINK, "linktolinkgoob.coom"),
-            ]],
+            ],
             new_nodes,
         )
 

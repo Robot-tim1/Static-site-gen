@@ -25,22 +25,15 @@ class TextNode():
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
     
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
-    clean_nodes = [] 
+    
     new_nodes = [[]]
     delimiter_size = len(delimiter)
-    for node in old_nodes:
-        if node.text_type == TextType.TEXT:
-            clean_nodes.append(node)
-        else:
-            new_nodes[0].append(node)
-    
-    if new_nodes[0] != []:
-        counter = 0
-    else:    
-        counter = -1
+    counter = -1
 
-    for clean_node in clean_nodes:
-        
+    for clean_node in old_nodes:
+        if clean_node.text_type != TextType.TEXT:
+            new_nodes[counter].append(clean_node)
+            continue
         counter += 1
         stack = [1,1]
         front_point = 0
@@ -104,17 +97,21 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
         
         if new_nodes[counter][0].text == "":
             del new_nodes[counter][0]
+        
+        if len(new_nodes) > 1:
+            for i in range(1, len(new_nodes)):     
+                new_nodes[0].extend(new_nodes[1])
+                del new_nodes[1]
+                counter -= 1      
 
-        counter2 = 0
-        for node in new_nodes[counter]:
-            if node.text_type == TextType.TEXT:
-                counter2 += 1
-        if counter2 == len(new_nodes[counter]):
-            raise Exception("invalid, no things to delimit here")
-    
-    if len(new_nodes) == 1:
-        return new_nodes[0]
-    return new_nodes
+    counter2 = 0
+    for node in new_nodes[0]:
+        if node.text_type == TextType.TEXT:
+            counter2 += 1
+    if counter2 == len(new_nodes[0]):
+        raise Exception("invalid, no things to delimit here")
+ 
+    return new_nodes[0]
 
 def extract_markdown_images(text):
     matches = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
@@ -130,7 +127,7 @@ def split_nodes_link(old_nodes):
     node_counter = -1
 
     for node in old_nodes:
-        
+
         node_counter += 1
         text = node.text
         
@@ -138,7 +135,7 @@ def split_nodes_link(old_nodes):
             new_nodes.append([])
 
         if extract_markdown_links(text) == []:
-            new_nodes[node_counter].append(TextNode(text, node.text_type))
+            new_nodes[node_counter].append(TextNode(text, node.text_type, node.url))
             continue
         
         while extract_markdown_links(text) != []:
@@ -156,10 +153,13 @@ def split_nodes_link(old_nodes):
             text = sections[1]
         if text != "":
             new_nodes[node_counter].append(TextNode(text, node.text_type))
-    
-    if len(new_nodes) == 1:
-        return new_nodes[0]
-    return new_nodes
+
+    if len(new_nodes) > 1:
+        for i in range(1, len(new_nodes)):     
+            new_nodes[0].extend(new_nodes[1])
+            del new_nodes[1]
+
+    return new_nodes[0]
 
 def split_nodes_image(old_nodes):
     
@@ -175,7 +175,7 @@ def split_nodes_image(old_nodes):
             new_nodes.append([])
 
         if extract_markdown_images(text) == []:
-            new_nodes[node_counter].append(TextNode(text, node.text_type))
+            new_nodes[node_counter].append(TextNode(text, node.text_type, node.url))
             continue
         
         while extract_markdown_images(text) != []:
@@ -194,6 +194,26 @@ def split_nodes_image(old_nodes):
         if text != "":
             new_nodes[node_counter].append(TextNode(text, node.text_type))
     
-    if len(new_nodes) == 1:
-        return new_nodes[0]
-    return new_nodes
+    if len(new_nodes) > 1:
+        for i in range(1, len(new_nodes)):     
+            new_nodes[0].extend(new_nodes[1])
+            del new_nodes[1]
+
+    return new_nodes[0]
+
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.TEXT)]
+
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+   
+    nodes = split_nodes_image(nodes)
+
+    nodes = split_nodes_link(nodes)
+
+    return nodes
+            
+print(text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"))
