@@ -1,6 +1,58 @@
 import unittest
 
 from textnode import *
+from htmlnode import *
+
+class TestTextNode2(unittest.TestCase):
+    def test_eq(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node", TextType.TEXT)
+        self.assertEqual(node, node2)
+
+    def test_eq_false(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node", TextType.BOLD)
+        self.assertNotEqual(node, node2)
+
+    def test_eq_false2(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node2", TextType.TEXT)
+        self.assertNotEqual(node, node2)
+
+    def test_eq_url(self):
+        node = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
+        node2 = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
+        self.assertEqual(node, node2)
+
+    def test_repr(self):
+        node = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
+        self.assertEqual(
+            "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
+        )
+
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
+    def test_text(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+
+    def test_image(self):
+        node = TextNode("This is an image", TextType.IMAGE, "https://www.boot.dev")
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "img")
+        self.assertEqual(html_node.value, "")
+        self.assertEqual(
+            html_node.props,
+            {"src": "https://www.boot.dev", "alt": "This is an image"},
+        )
+
+    def test_bold(self):
+        node = TextNode("This is bold", TextType.BOLD)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "b")
+        self.assertEqual(html_node.value, "This is bold")
 
 
 class TestTextNode(unittest.TestCase):
@@ -127,18 +179,19 @@ class TestTextNode(unittest.TestCase):
 
     def test_split_link3(self):
         node = TextNode(
-            "This is bold text with an [this is a link](linktolink.com) and another [second link](secondlink.net)",
-            TextType.BOLD,
+            "This is bold text with an [this is a link](linktolink.com) and another [second link](secondlink.net) thing",
+            TextType.TEXT,
         )
         new_nodes = split_nodes_link([node])
         self.assertListEqual(
             [
-                TextNode("This is bold text with an ", TextType.BOLD),
+                TextNode("This is bold text with an ", TextType.TEXT),
                 TextNode("this is a link", TextType.LINK, "linktolink.com"),
-                TextNode(" and another ", TextType.BOLD),
+                TextNode(" and another ", TextType.TEXT),
                 TextNode(
                     "second link", TextType.LINK, "secondlink.net"
                 ),
+                TextNode(" thing", TextType.TEXT),
             ],
             new_nodes,
         )
@@ -235,6 +288,51 @@ This is the same paragraph on a new line
                 "1. This is a list\n2. with items",
             ],
         )
+
+    def test_markdown_block_heading(self):
+        block = '#### heading'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.HEADING)
+
+    def test_markdown_blocks_heading2(self):
+        block = '####heading'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.PARAGRAPH)
+
+    def test_markdown_blocks_code(self):
+        block = '```\ncode block\nplus a bit more```'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.CODE)
+
+    def test_markdown_blocks_quote(self):
+        block = '> quote block'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.QUOTE)
+    
+    def test_markdown_blocks_quote2(self):
+        block = '>quote block'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.QUOTE)
+
+    def test_markdown_blocks_heading3(self):
+        block = '####### heading'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.PARAGRAPH)
+
+    def test_markdown_blocks_heading4(self):
+        block = '# heading'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.HEADING)
+
+    def test_markdown_blocks_unorderedlist(self):
+        block = '- thing\n- thing2'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.UNORDERED)
+
+    def test_markdown_blocks_orderedlist(self):
+        block = '1. thing\n2. thing2'
+        type = block_to_block_type(block)
+        self.assertEqual(type, BlockType.ORDERED)
 
 if __name__ == "__main__":
     unittest.main()
