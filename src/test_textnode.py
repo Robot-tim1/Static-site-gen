@@ -216,5 +216,25 @@ This is **bolded** paragraph
             ],
         )
 
+    def test_markdown_to_blocks3(self):
+        md = """
+#### HEADING4
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+1. This is a list
+2. with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "#### HEADING4",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "1. This is a list\n2. with items",
+            ],
+        )
+
 if __name__ == "__main__":
     unittest.main()
