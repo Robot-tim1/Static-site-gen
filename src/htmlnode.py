@@ -69,4 +69,18 @@ def text_node_to_html_node(text_node: TextNode):
     raise ValueError(f"invalid text type: {text_node.text_type}")
 
 def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        parent_node = blocktype_to_parent_node(block_type, block)
+
+def blocktype_to_parent_node(block_type, block_text: str):
+    if block_type == BlockType.CODE:
+        return ParentNode('pre', ParentNode(BlockType.CODE, None, None), None)
+    if block_type == BlockType.HEADING:
+        num = len(block_text.split()[0])
+        return ParentNode(f'{BlockType.HEADING}{num}', None, None)
+    return ParentNode(block_type, None, None)
+
+def text_to_children(text):
     pass

@@ -10,12 +10,12 @@ class TextType(Enum):
     IMAGE = "image"
 
 class BlockType(Enum):
-    PARAGRAPH = 'paragraph'
-    HEADING = 'heading'
+    PARAGRAPH = 'p'
+    HEADING = 'h'
     CODE = 'code'
-    QUOTE = 'quote'
-    UNORDERED = 'unordered'
-    ORDERED = 'ordered'
+    QUOTE = 'blockquote'
+    UNORDERED = 'ul'
+    ORDERED = 'ol'
 
 class TextNode():
     def __init__(self, text, text_type, url=None):
