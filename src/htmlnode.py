@@ -81,13 +81,13 @@ def markdown_to_html_node(markdown):
     parent_div.children = div_children
     return parent_div
         
-def blocktype_to_parent_node(block_type, block_text: str):
+def blocktype_to_parent_node(block_type: BlockType, block_text: str):
     if block_type == BlockType.CODE:
-        return ParentNode('pre', [ParentNode('code', None, None)], None)
+        return ParentNode('pre', [ParentNode(block_type.value, None, None)], None)
     if block_type == BlockType.HEADING:
         num = len(block_text.split()[0])
-        return ParentNode(f'h{num}', None, None)
-    return ParentNode(block_type, None, None)
+        return ParentNode(f'{block_type.value}{num}', None, None)
+    return ParentNode(block_type.value, None, None)
 
 def text_to_children(text):
     nodes = text_to_textnodes(text)
