@@ -70,28 +70,23 @@ def text_node_to_html_node(text_node: TextNode):
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
-    div_parent = ParentNode('div', None, None)
+    parent_div = ParentNode('div', None, None)
     div_children = []  
     for block in blocks:
         block_type = block_to_block_type(block)
         parent_node = blocktype_to_parent_node(block_type, block)
         
-        if block_type == BlockType.CODE:
-            text = block.removeprefix('```\n').removesuffix('```')
-            text_node = TextNode(text, TextType.TEXT, None)
-            parent_node.children.children == text_node_to_html_node(text_node)
-            div_children.append(parent_node)
-            continue
-        
-        if block_type == BlockType.ORDERED or block_type == BlockType.UNORDERED:
-            pass
+        add_div_children_node(block_type, block, parent_node, div_children)
+
+    parent_div.children = div_children
+    return parent_div
         
 def blocktype_to_parent_node(block_type, block_text: str):
     if block_type == BlockType.CODE:
-        return ParentNode('pre', ParentNode(BlockType.CODE, None, None), None)
+        return ParentNode('pre', [ParentNode('code', None, None)], None)
     if block_type == BlockType.HEADING:
         num = len(block_text.split()[0])
-        return ParentNode(f'{BlockType.HEADING}{num}', None, None)
+        return ParentNode(f'h{num}', None, None)
     return ParentNode(block_type, None, None)
 
 def text_to_children(text):
@@ -100,3 +95,13 @@ def text_to_children(text):
     for node in nodes:
         leaf_nodes.append(text_node_to_html_node(node))
     return leaf_nodes
+
+def add_div_children_node(block_type, block_text: str, parent_node: ParentNode, div_children: list):
+    if block_type == BlockType.CODE:
+        text = block_text.removeprefix('```\n').removesuffix('```')
+        text_node = TextNode(text, TextType.TEXT, None)
+        parent_node.children[0].children = [text_node_to_html_node(text_node)]
+        div_children.append(parent_node)
+                
+    elif block_type == BlockType.ORDERED or block_type == BlockType.UNORDERED:
+        pass

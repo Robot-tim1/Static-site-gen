@@ -333,5 +333,20 @@ This is the same paragraph on a new line
         type = block_to_block_type(block)
         self.assertEqual(type, BlockType.ORDERED)
 
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
+
 if __name__ == "__main__":
     unittest.main()
