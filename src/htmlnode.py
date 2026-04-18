@@ -70,10 +70,22 @@ def text_node_to_html_node(text_node: TextNode):
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
+    div_parent = ParentNode('div', None, None)
+    div_children = []  
     for block in blocks:
         block_type = block_to_block_type(block)
         parent_node = blocktype_to_parent_node(block_type, block)
-
+        
+        if block_type == BlockType.CODE:
+            text = block.removeprefix('```\n').removesuffix('```')
+            text_node = TextNode(text, TextType.TEXT, None)
+            parent_node.children.children == text_node_to_html_node(text_node)
+            div_children.append(parent_node)
+            continue
+        
+        if block_type == BlockType.ORDERED or block_type == BlockType.UNORDERED:
+            pass
+        
 def blocktype_to_parent_node(block_type, block_text: str):
     if block_type == BlockType.CODE:
         return ParentNode('pre', ParentNode(BlockType.CODE, None, None), None)
@@ -83,4 +95,8 @@ def blocktype_to_parent_node(block_type, block_text: str):
     return ParentNode(block_type, None, None)
 
 def text_to_children(text):
-    pass
+    nodes = text_to_textnodes(text)
+    leaf_nodes = []
+    for node in nodes:
+        leaf_nodes.append(text_node_to_html_node(node))
+    return leaf_nodes
