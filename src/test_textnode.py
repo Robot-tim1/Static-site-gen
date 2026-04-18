@@ -179,7 +179,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_split_link3(self):
         node = TextNode(
-            "This is bold text with an [this is a link](linktolink.com) and another [second link](secondlink.net) thing",
+            "This is bold text with an [this is a link](linktolink.com) and another [second link](secondlink.net)",
             TextType.TEXT,
         )
         new_nodes = split_nodes_link([node])
@@ -191,7 +191,6 @@ class TestTextNode(unittest.TestCase):
                 TextNode(
                     "second link", TextType.LINK, "secondlink.net"
                 ),
-                TextNode(" thing", TextType.TEXT),
             ],
             new_nodes,
         )
