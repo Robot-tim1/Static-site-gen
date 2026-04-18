@@ -74,8 +74,7 @@ def markdown_to_html_node(markdown):
     div_children = []  
     for block in blocks:
         block_type = block_to_block_type(block)
-        parent_node = blocktype_to_parent_node(block_type, block)
-        
+        parent_node = blocktype_to_parent_node(block_type, block)    
         add_div_children_node(block_type, block, parent_node, div_children)
 
     parent_div.children = div_children
@@ -104,4 +103,31 @@ def add_div_children_node(block_type, block_text: str, parent_node: ParentNode, 
         div_children.append(parent_node)
                 
     elif block_type == BlockType.ORDERED or block_type == BlockType.UNORDERED:
-        pass
+        child_list = []
+        split = block_text.split('\n')
+        split = list(map(lambda line: line[3:], split))
+        for line in split:
+            child_list.append(ParentNode('li', text_to_children(line), None))
+        parent_node.children = child_list
+        div_children.append(parent_node)
+    
+    elif block_type == BlockType.HEADING:
+        split = block_text.split()
+        text = " ".join(split[1:])
+        parent_node.children = text_to_children(text)
+        div_children.append(parent_node)
+
+    elif block_type == BlockType.QUOTE:
+        if block_text[0:2] == '> ':
+            text = block_text[2:]
+        else:
+            text = block_text[1:]
+        parent_node.children = text_to_children(text)
+        div_children.append(parent_node)
+
+    elif block_type == BlockType.PARAGRAPH:
+        text = block_text.replace('\n', ' ')
+        parent_node.children = text_to_children(text)
+        div_children.append(parent_node)
+    else:
+        raise Exception("Something went very wrong with blocktype")
