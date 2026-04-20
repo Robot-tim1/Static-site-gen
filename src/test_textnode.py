@@ -364,5 +364,90 @@ This is another paragraph with _italic_ text and `code` here
             "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
         )
 
+    def test_heading(self):
+        md = """
+##### this is a _heading_
+five
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h5>this is a <i>heading</i> five</h5></div>",
+        )
+
+    def test_blockquote(self):
+        md = """
+> This is a blockquote
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a blockquote</blockquote></div>",
+        )
+
+    def test_blockquote2(self):
+        md = """
+>This is a blockquote
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a blockquote</blockquote></div>",
+        )
+
+    def test_unorderedlist(self):
+        md = """
+- item 1
+- item 2
+- item 3
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul></div>",
+        )
+
+    def test_orderedlist(self):
+        md = """
+1. item 1
+2. item 2
+3. item 3
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ol><li>item 1</li><li>item 2</li><li>item 3</li></ol></div>",
+        )
+
+    def test_alltogether(self):
+        md = """
+# this is a heading
+
+this is a paragraph
+that says stuff
+
+> this is a blockquote
+
+- list 1
+
+1. list 2
+
+```
+this is a
+code block
+```
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h1>this is a heading</h1><p>this is a paragraph that says stuff</p><blockquote>this is a blockquote</blockquote><ul><li>list 1</li></ul><ol><li>list 2</li></ol><pre><code>this is a\ncode block\n</code></pre></div>",
+        )
+
 if __name__ == "__main__":
     unittest.main()

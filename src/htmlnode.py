@@ -105,7 +105,10 @@ def add_div_children_node(block_type, block_text: str, parent_node: ParentNode, 
     elif block_type == BlockType.ORDERED or block_type == BlockType.UNORDERED:
         child_list = []
         split = block_text.split('\n')
-        split = list(map(lambda line: line[3:], split))
+        if block_type == BlockType.UNORDERED:  
+            split = list(map(lambda line: line[2:], split))
+        else:
+            split = list(map(lambda line: line[3:], split))
         for line in split:
             child_list.append(ParentNode('li', text_to_children(line), None))
         parent_node.children = child_list
