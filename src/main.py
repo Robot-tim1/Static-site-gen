@@ -1,9 +1,10 @@
+import os
+
 from textnode import *
 from htmlnode import *
 from page_generation import *
 
 def main():
-    pass
-
+    static_to_public()
 
 main()
