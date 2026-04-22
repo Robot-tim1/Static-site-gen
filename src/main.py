@@ -1,8 +1,9 @@
 from textnode import *
+from htmlnode import *
+from page_generation import *
 
 def main():
-    test_node = TextNode("This is bold", TextType.BOLD)
-    print(test_node)
+    pass
 
 
 main()
