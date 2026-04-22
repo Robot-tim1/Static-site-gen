@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from textnode import *
+
 def static_to_public(static_dir=os.path.join('.', 'static'), public_dir=os.path.join('.', 'public'), next_dir=None):
     if next_dir:
         static_dir = os.path.join(static_dir, next_dir)
@@ -19,3 +21,10 @@ def static_to_public(static_dir=os.path.join('.', 'static'), public_dir=os.path.
 
     for directory in directory_list:
         static_to_public(static_dir, public_dir, directory)
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block.startswith('# '):
+            return block[2:].strip()
+    raise Exception('No h1 header')

@@ -2,7 +2,7 @@ import unittest
 
 from htmlnode import *
 from textnode import *
-
+from page_generation import *
 
 class TestHTMLNode(unittest.TestCase):
     def test_to_html_props(self):
@@ -330,5 +330,21 @@ class TestHTMLNode(unittest.TestCase):
     TextNode(" with a italic ", TextType.TEXT),
     TextNode("block word", TextType.ITALIC),])
         
+    def test_extract_title(self):
+        header = extract_title('# Hello')
+        self.assertEqual(header, 'Hello')
+
+    def test_extract_title2(self):
+        header = extract_title('#   Title and stuff  ')
+        self.assertEqual(header, 'Title and stuff')
+
+    def test_extract_title3(self):
+        header = extract_title('paragraph before title who cares\n\n# This is the title')
+        self.assertEqual(header, 'This is the title')
+
+    def test_extract_title_exception(self):
+        with self.assertRaises(Exception):
+            header = extract_title('paragraph who cares')
+
 if __name__ == "__main__":
     unittest.main()
