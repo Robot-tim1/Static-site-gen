@@ -398,6 +398,19 @@ five
             "<div><blockquote>This is a blockquote</blockquote></div>",
         )
 
+    def test_blockquote3(self):
+        md = """
+>This is a blockquote
+>
+> and stuff
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a blockquote and stuff</blockquote></div>",
+        )
+
     def test_unorderedlist(self):
         md = """
 - item 1

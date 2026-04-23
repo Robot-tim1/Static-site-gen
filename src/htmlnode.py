@@ -121,10 +121,14 @@ def add_div_children_node(block_type, block_text: str, parent_node: ParentNode, 
         div_children.append(parent_node)
 
     elif block_type == BlockType.QUOTE:
-        if block_text[0:2] == '> ':
-            text = block_text[2:]
-        else:
-            text = block_text[1:]
+        split_text = block_text.split('\n')
+        content = []
+        for text in split_text:
+            if text[0:2] == '> ' and len(text.strip()) > 1:
+                content.append(text[2:])
+            elif len(text.strip()) > 1:
+                content.append(text[1:])
+        text = ' '.join(content)
         parent_node.children = text_to_children(text)
         div_children.append(parent_node)
 
