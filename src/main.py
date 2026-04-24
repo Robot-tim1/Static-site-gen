@@ -8,6 +8,6 @@ def main():
         shutil.rmtree('public')
     os.mkdir('public')
     static_to_public()
-    generate_page(os.path.join('content', 'index.md'), 'template.html', os.path.join('public', 'index.html'))
+    generate_pages_recursive('content', 'template.html', 'public')
 
 main()
