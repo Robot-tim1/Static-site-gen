@@ -4,7 +4,7 @@ import shutil
 from textnode import *
 from htmlnode import *
 
-def static_to_public(static_dir=os.path.join('.', 'static'), public_dir=os.path.join('.', 'public'), next_dir=None):
+def static_to_docs(static_dir=os.path.join('', 'static'), public_dir=os.path.join('', 'docs'), next_dir=None):
     if next_dir:
         static_dir = os.path.join(static_dir, next_dir)
         public_dir = os.path.join(public_dir, next_dir)
@@ -21,7 +21,7 @@ def static_to_public(static_dir=os.path.join('.', 'static'), public_dir=os.path.
             directory_list.append(file)
 
     for directory in directory_list:
-        static_to_public(static_dir, public_dir, directory)
+        static_to_docs(static_dir, public_dir, directory)
 
 def extract_title(markdown):
     blocks = markdown_to_blocks(markdown)
@@ -30,7 +30,7 @@ def extract_title(markdown):
             return block[2:].strip()
     raise Exception('No h1 header')
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path) as file:
         text = file.read()
@@ -38,18 +38,18 @@ def generate_page(from_path, template_path, dest_path):
         template = file.read()
     content = markdown_to_html_node(text).to_html()
     title = extract_title(text)
-    html = template.replace('{{ Title }}', title).replace('{{ Content }}', content)
+    html = template.replace('{{ Title }}', title).replace('{{ Content }}', content).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, 'w') as file:
         file.write(html)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     dir_list = os.listdir(dir_path_content)
     child_dirs = []
     for item in dir_list:
         if item == 'index.md':
-            generate_page(os.path.join(dir_path_content, 'index.md'), template_path, os.path.join(dest_dir_path, 'index.html'))
+            generate_page(os.path.join(dir_path_content, 'index.md'), template_path, os.path.join(dest_dir_path, 'index.html'), basepath)
         else:
             child_dirs.append(item)
     for dirs in child_dirs:
-        generate_pages_recursive(os.path.join(dir_path_content, dirs), template_path, os.path.join(dest_dir_path, dirs))
+        generate_pages_recursive(os.path.join(dir_path_content, dirs), template_path, os.path.join(dest_dir_path, dirs), basepath)
